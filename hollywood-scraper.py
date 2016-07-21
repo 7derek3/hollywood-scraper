@@ -4,6 +4,12 @@ import requests
 import sys
 from datetime import datetime
 
+def getDate():
+    today = datetime.today()
+    month = today.month
+    year = today.year
+    return month, year
+
 def buildUri(month, year):
     baseUri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
     monthArg = '&aec_month=' + str(month)
@@ -30,7 +36,8 @@ def parseHtml(days):
             print(film.xpath('p/strong/text()')[0])
 
 def main():
-    uri = buildUri(7, 2016)
+    month, year = getDate()
+    uri = buildUri(month, year)
     days = makeRequest(uri)
     output = parseHtml(days)
 
