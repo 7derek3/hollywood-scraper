@@ -1,9 +1,16 @@
 from lxml import etree
 from io import StringIO, BytesIO
 import requests
+import sys
 from datetime import datetime
 
-page = requests.get('http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container&aec_month=7&aec_year=2016')
+def buildUri(month, year):
+    baseUri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
+    monthUri = '&aec_month=' + str(month)
+    yearUri = '&aec_year=' + str(year)
+    uri = baseUri + monthUri + yearUri
+    return uri
+
 parser = etree.HTMLParser()
 tree = etree.parse(StringIO(page.text), parser)
 events = tree.xpath('//div[@class=\'aec-event-info\']')
