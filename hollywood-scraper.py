@@ -11,16 +11,17 @@ def buildUri(month, year):
     uri = baseUri + monthUri + yearUri
     return uri
 
+page = requests.get(buildUri(7, 2016))
 parser = etree.HTMLParser()
 tree = etree.parse(StringIO(page.text), parser)
-events = tree.xpath('//div[@class=\'aec-event-info\']')
+days = tree.xpath('//div[@class=\'aec-event-info\']')
 
-for event in events:
-    date = event.xpath('h2[@class=\'widgettitle\']/text()')[0]
+for day in days:
+    date = day.xpath('h2[@class=\'widgettitle\']/text()')[0]
     date = date.replace("Showing ", "")
     date = datetime.strptime(date, '%B %d, %Y')
     print(date.strftime('%B %d, %Y'))
-    films = event.xpath('.//li[@class=\'aec-tooltip-feed-agile\']')
+    films = day.xpath('.//li[@class=\'aec-tooltip-feed-agile\']')
 
     for film in films:
         print(film.xpath('p/strong/text()')[0])
