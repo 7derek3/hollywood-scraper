@@ -2,7 +2,14 @@ from lxml import etree
 from io import StringIO, BytesIO
 import requests
 import sys
+import re
 from datetime import datetime
+
+class Showing(object):
+
+    def __init__(self, name, date):
+        self.name = name
+        self.date = date
 
 def getDate():
     today = datetime.today()
@@ -29,11 +36,20 @@ def parseHtml(days):
         date = day.xpath('h2[@class=\'widgettitle\']/text()')[0]
         date = date.replace("Showing ", "")
         date = datetime.strptime(date, '%B %d, %Y')
-        print(date.strftime('%B %d, %Y'))
+        # print(date.strftime('%B %d, %Y'))
         films = day.xpath('.//li[@class=\'aec-tooltip-feed-agile\']')
 
         for film in films:
-            print(film.xpath('p/strong/text()')[0])
+            titleTimes = film.xpath('p/strong/text()')[0]
+
+            title = re.search('(.*) \|', titleTimes)
+            title = title.group(1)
+            print title
+
+            times = re.search('\|  (.*)', titleTimes)
+            times = times.group(1)
+            print times
+
 
 def main():
     month, year = getDate()
