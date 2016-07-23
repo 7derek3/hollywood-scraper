@@ -9,16 +9,20 @@ class Showing(object):
         self.title = title
         self.time = time
 
-def getDate():
+def getDates():
     today = datetime.today()
-    month = today.month
-    year = today.year
-    return month, year
+    thisMonth = [today.month, today.year]
+    def nextMonth(month):
+        if month == 12:
+            return [month + 1, today.year + 1]
+        else:
+            return [month + 1, today.year]
+    return [thisMonth, nextMonth(today.month)]
 
-def buildUri(month, year):
+def buildUri(month):
     baseUri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
-    monthArg = '&aec_month=' + str(month)
-    yearArg = '&aec_year=' + str(year)
+    monthArg = '&aec_month=' + str(month[0])
+    yearArg = '&aec_year=' + str(month[1])
     uri = baseUri + monthArg + yearArg
     return uri
 
@@ -50,9 +54,12 @@ def parseHtml(days):
                 print showing.title, showing.time
 
 def main():
-    month, year = getDate()
-    uri = buildUri(month, year)
-    days = makeRequest(uri)
-    output = parseHtml(days)
+    months = getDates()
+    thisMonthUri = buildUri(months[0])
+    nextMonthUri = buildUri(months[1])
+    thisMonthResponse = makeRequest(thisMonthUri)
+    nextMonthResponse = makeRequest(nextMonthUri)
+    responses = thisMonthResponse + nextMonthResponse
+    output = parseHtml(responses)
 
 main()
