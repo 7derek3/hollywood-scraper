@@ -6,9 +6,9 @@ from datetime import datetime
 
 class Showing(object):
 
-    def __init__(self, name, date):
-        self.name = name
-        self.date = date
+    def __init__(self, title, time):
+        self.title = title
+        self.time = time
 
 def getDate():
     today = datetime.today()
@@ -41,12 +41,14 @@ def parseHtml(days):
             titleTimes = film.xpath('p/strong/text()')[0]
             titleTimes = titleTimes.split(' |  ')
             title = titleTimes[0]
-            print title
 
             times = titleTimes[1]
             times = times.split()
             for time in times:
-                print time
+                time = datetime.strptime(time, '%I:%M%p')
+                time = date.replace(hour=time.hour, minute=time.minute)
+                showing = Showing(title, time)
+                print showing.title, showing.time
 
 
 def main():
