@@ -51,7 +51,7 @@ def parseHtml(days):
                 time = datetime.strptime(time, '%I:%M%p')
                 time = date.replace(hour=time.hour, minute=time.minute)
                 showing = Showing(title, time)
-                print showing.title, showing.time
+                print (showing.title, showing.time)
 
 def main():
     months = getDates()
