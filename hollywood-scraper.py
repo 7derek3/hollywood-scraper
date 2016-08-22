@@ -101,6 +101,8 @@ def main():
     """
     print(hollywood_logo)
     parser = argparse.ArgumentParser(description='Movie Times!')
+    #This allows you to call the program like `hollywood-scraper.py next month`
+    # or something like hollywood-scraper.py today
     parser.add_argument('when',type=str,nargs='+',help='Time range for showings from today (e.g. Today, This Week)')
     args = parser.parse_args()
     datelimit =  "".join(args.when).lower()
