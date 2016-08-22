@@ -92,14 +92,14 @@ def parseHtml(days, limit):
                     print (showing.title, showing.time.strftime('%X %x %Z'))
 
 def main():
-    #     hollywood_logo = """\ HollyWood
-    # #######     ###     #   #
-    # #  #  #    #   #    #   #
-    # #  #  #   #     #   #   #
-    # #  #  #    #   #     # #
-    # #  #  #     ###       #
-    # """
-    # print(hollywood_logo)
+        hollywood_logo = """\ Hollywood D
+    #   #     ##     #      #      #   #  #    ###   #    ##     ##    #####
+    #   #    #  #    #      #       # #   #    # #   #   #  #   #  #   #    #
+    #####   #    #   #      #        #     #   # #   #  #    # #    #  #    #
+    #   #    #  #    #      #        #     #  #  #  #    #  #   #  #   #    #
+    #   #     ##     ####   ####     #      ##    ##      ##     ##    #####
+    """
+    print(hollywood_logo)
     parser = argparse.ArgumentParser(description='Movie Times!')
     parser.add_argument('when',type=str,nargs='+',help='Time range for showings from today (e.g. Today, This Week)')
     args = parser.parse_args()
