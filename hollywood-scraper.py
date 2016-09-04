@@ -5,17 +5,7 @@ import requests
 import sys
 from datetime import datetime
 
-def save_to_db(showings):
-    conn = psycopg2.connect("dbname=hollywood user=derekmiller")
-    cur = conn.cursor()
-    for showing in showings:
-        cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
-                    (showing['title'], showing['time'], showing['url']))
-        conn.commit()
-    cur.close()
-    conn.close()
-
-def getDates():
+def get_dates():
     today = datetime.today()
     thisMonth = [today.month, today.year]
     def nextMonth(month):
@@ -25,21 +15,21 @@ def getDates():
             return [month + 1, today.year]
     return [thisMonth, nextMonth(today.month)]
 
-def buildUri(month):
-    baseUri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
-    monthArg = '&aec_month=' + str(month[0])
-    yearArg = '&aec_year=' + str(month[1])
-    uri = baseUri + monthArg + yearArg
+def build_uri(month):
+    base_uri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
+    month_arg = '&aec_month=' + str(month[0])
+    year_arg = '&aec_year=' + str(month[1])
+    uri = base_uri + month_arg + year_arg
     return uri
 
-def makeRequest(uri):
+def make_request(uri):
     page = requests.get(uri)
     parser = etree.HTMLParser()
     tree = etree.parse(StringIO(page.text), parser)
     days = tree.xpath('//div[@class=\'aec-event-info\']')
     return days
 
-def parseHtml(days):
+def parse_html(days):
     showings = []
     for day in days:
         date = day.xpath('h2[@class=\'widgettitle\']/text()')[0]
@@ -63,14 +53,24 @@ def parseHtml(days):
 
     return showings
 
+def save_to_db(showings):
+    conn = psycopg2.connect("dbname=hollywood user=derekmiller")
+    cur = conn.cursor()
+    for showing in showings:
+        cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
+                    (showing['title'], showing['time'], showing['url']))
+        conn.commit()
+    cur.close()
+    conn.close()
+
 def main():
-    months = getDates()
-    thisMonthUri = buildUri(months[0])
-    nextMonthUri = buildUri(months[1])
-    thisMonthResponse = makeRequest(thisMonthUri)
-    nextMonthResponse = makeRequest(nextMonthUri)
-    responses = thisMonthResponse + nextMonthResponse
-    showings = parseHtml(responses)
+    months = get_dates()
+    this_month_uri = build_uri(months[0])
+    next_month_uri = build_uri(months[1])
+    this_month_response = make_request(this_month_uri)
+    next_month_response = make_request(next_month_uri)
+    responses = this_month_response + next_month_response
+    showings = parse_html(responses)
     save_to_db(showings)
 
 main()
