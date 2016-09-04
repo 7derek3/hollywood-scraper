@@ -56,10 +56,17 @@ def parse_html(days):
 def save_to_db(showings):
     conn = psycopg2.connect("dbname=hollywood user=derekmiller")
     cur = conn.cursor()
+
+    # CREATE TABLE showings (id serial PRIMARY KEY, title varchar, time timestamp, url varchar, UNIQUE (title, time));
+
     for showing in showings:
-        cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
-                    (showing['title'], showing['time'], showing['url']))
-        conn.commit()
+        try:
+            cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
+                        (showing['title'], showing['time'], showing['url']))
+            conn.commit()
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            continue
     cur.close()
     conn.close()
 
