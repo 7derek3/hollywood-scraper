@@ -45,6 +45,7 @@ def makeRequest(uri):
     return days
 
 def parseHtml(days):
+    showings = []
     for day in days:
         date = day.xpath('h2[@class=\'widgettitle\']/text()')[0]
         date = date.replace("Showing ", "")
@@ -63,8 +64,8 @@ def parseHtml(days):
             for time in times:
                 time = datetime.strptime(time, '%I:%M%p')
                 time = date.replace(hour=time.hour, minute=time.minute)
-                showing = Showing(title, time, url)
-                save_to_db(showing)
+
+                showings.append(title, time, url)
 
 def main():
     months = getDates()
@@ -73,6 +74,7 @@ def main():
     thisMonthResponse = makeRequest(thisMonthUri)
     nextMonthResponse = makeRequest(nextMonthUri)
     responses = thisMonthResponse + nextMonthResponse
-    parseHtml(responses)
+    showings = parseHtml(responses)
+    print (showingss)
 
 main()
