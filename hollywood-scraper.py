@@ -5,9 +5,10 @@ import sys
 from datetime import datetime
 
 class Showing(object):
-    def __init__(self, title, time):
+    def __init__(self, title, time, url):
         self.title = title
         self.time = time
+        self.url = url
 
 def getDates():
     today = datetime.today()
@@ -41,17 +42,19 @@ def parseHtml(days):
         films = day.xpath('.//li[@class=\'aec-tooltip-feed-agile\']')
 
         for film in films:
-            film = film.xpath('p/strong/text()')[0]
-            film = film.split(' |  ')
-            title = film[0]
-            times = film[1]
+            film_details = film.xpath('.//p')
+            film_title_times = film_details[0].xpath('strong/text()')[0]
+            film_title_times = film_title_times.split(' |  ')
+            url = film_details[1].xpath('a/@href')[0]
+            title = film_title_times[0]
+            times = film_title_times[1]
             times = times.split()
 
             for time in times:
                 time = datetime.strptime(time, '%I:%M%p')
                 time = date.replace(hour=time.hour, minute=time.minute)
-                showing = Showing(title, time)
-                print (showing.title, showing.time)
+                showing = Showing(title, time, url)
+                print (showing.title, showing.time, showing.url)
 
 def main():
     months = getDates()
