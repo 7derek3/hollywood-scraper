@@ -1,4 +1,5 @@
 from lxml import etree
+import psycopg2
 from io import StringIO, BytesIO
 import requests
 import sys
@@ -9,6 +10,15 @@ class Showing(object):
         self.title = title
         self.time = time
         self.url = url
+
+def save_to_db(showing):
+    conn = psycopg2.connect("dbname=hollywood user=derekmiller")
+    cur = conn.cursor()
+    cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
+                (showing.title, showing.time, showing.url))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def getDates():
     today = datetime.today()
@@ -54,7 +64,7 @@ def parseHtml(days):
                 time = datetime.strptime(time, '%I:%M%p')
                 time = date.replace(hour=time.hour, minute=time.minute)
                 showing = Showing(title, time, url)
-                print (showing.title, showing.time, showing.url)
+                save_to_db(showing)
 
 def main():
     months = getDates()
@@ -63,6 +73,6 @@ def main():
     thisMonthResponse = makeRequest(thisMonthUri)
     nextMonthResponse = makeRequest(nextMonthUri)
     responses = thisMonthResponse + nextMonthResponse
-    output = parseHtml(responses)
+    parseHtml(responses)
 
 main()
