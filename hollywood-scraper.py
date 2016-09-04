@@ -5,18 +5,13 @@ import requests
 import sys
 from datetime import datetime
 
-class Showing(object):
-    def __init__(self, title, time, url):
-        self.title = title
-        self.time = time
-        self.url = url
-
-def save_to_db(showing):
+def save_to_db(showings):
     conn = psycopg2.connect("dbname=hollywood user=derekmiller")
     cur = conn.cursor()
-    cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
-                (showing.title, showing.time, showing.url))
-    conn.commit()
+    for showing in showings:
+        cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
+                    (showing['title'], showing['time'], showing['url']))
+        conn.commit()
     cur.close()
     conn.close()
 
@@ -64,8 +59,9 @@ def parseHtml(days):
             for time in times:
                 time = datetime.strptime(time, '%I:%M%p')
                 time = date.replace(hour=time.hour, minute=time.minute)
+                showings.append({'title': title, 'time': time, 'url': url})
 
-                showings.append(title, time, url)
+    return showings
 
 def main():
     months = getDates()
@@ -75,6 +71,6 @@ def main():
     nextMonthResponse = makeRequest(nextMonthUri)
     responses = thisMonthResponse + nextMonthResponse
     showings = parseHtml(responses)
-    print (showingss)
+    save_to_db(showings)
 
 main()
