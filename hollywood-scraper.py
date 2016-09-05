@@ -61,8 +61,9 @@ def save_to_db(showings):
 
     for showing in showings:
         try:
-            cur.execute('INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)',
-                        (showing['title'], showing['time'], showing['url']))
+            sql = 'INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)'
+            data = (showing['title'], showing['time'], showing['url'])
+            cur.execute(sql, data)
             conn.commit()
         except psycopg2.IntegrityError:
             conn.rollback()
