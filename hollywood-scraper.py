@@ -7,13 +7,13 @@ from datetime import datetime
 
 def get_dates():
     today = datetime.today()
-    thisMonth = [today.month, today.year]
-    def nextMonth(month):
+    this_month = [today.month, today.year]
+    def next_month(month):
         if month == 12:
             return [month + 1, today.year + 1]
         else:
             return [month + 1, today.year]
-    return [thisMonth, nextMonth(today.month)]
+    return [this_month, next_month(today.month)]
 
 def build_uri(month):
     base_uri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
