@@ -19,17 +19,17 @@ def get_showings():
         end_date = start_date + datetime.timedelta(days=7)
         start_date = start_date.strftime('%Y-%m-%d')
         end_date = end_date.strftime('%Y-%m-%d')
-    elif end_date == None or end_date == '':
+    elif start_date and (end_date == None or end_date == ''):
         end_date = start_date
     try:
         start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
         end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
         end_date = datetime.datetime.combine(end_date, datetime.time(23, 59, 59))
-        print(start_date, end_date)
     except ValueError:
         return jsonify({'errors': {'status': '400', 'details': 'Incorrect date format. Should be \'year-month-day\''}})
 
-    cur.execute('SELECT * FROM showings WHERE time BETWEEN %s AND %s;', (start_date, end_date))
+    cur.execute('SELECT * FROM showings WHERE time BETWEEN %s AND %s ORDER BY time ASC;',
+               (start_date, end_date))
     data = cur.fetchall()
     showings = []
     for x in data:
