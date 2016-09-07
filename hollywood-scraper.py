@@ -59,7 +59,7 @@ def save_to_db(showings):
     cur = conn.cursor()
 
     try:
-        cur.execute('CREATE TABLE showings (id serial PRIMARY KEY, \
+        cur.execute('CREATE TABLE showings (id bigserial PRIMARY KEY, \
              title varchar, time timestamp, url varchar, UNIQUE (title, time))')
     except psycopg2.ProgrammingError:
         pass

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import json
 from flask import jsonify
 from flask import request
 import psycopg2
@@ -14,13 +15,15 @@ def get_showings():
     start_date = request.headers.get('start_date')
     end_date = request.headers.get('end_date')
 
-    if (start_date == None or start_date == '') and \
-           (end_date == None or end_date == ''):
+    if not start_date and not end_date:
         start_date = datetime.datetime.today()
         end_date = start_date + datetime.timedelta(days=7)
         start_date = start_date.strftime('%Y-%m-%d')
         end_date = end_date.strftime('%Y-%m-%d')
-    elif start_date and (end_date == None or end_date == ''):
+    elif not start_date and end_date:
+        start_date = datetime.datetime.today()
+        start_date = start_date.strftime('%Y-%m-%d')
+    elif start_date and not end_date:
         end_date = start_date
     try:
         start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
