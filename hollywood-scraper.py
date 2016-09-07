@@ -16,7 +16,8 @@ def get_dates():
     return [this_month, next_month(today.month)]
 
 def build_uri(month):
-    base_uri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
+    base_uri = 'http://hollywoodtheatre.org/wp-admin/admin-ajax.php?\
+        action=aec_ajax&aec_type=widget&aec_widget_id=aec_widget-5-container'
     month_arg = '&aec_month=' + str(month[0])
     year_arg = '&aec_year=' + str(month[1])
     uri = base_uri + month_arg + year_arg
@@ -57,17 +58,24 @@ def save_to_db(showings):
     conn = psycopg2.connect("dbname=hollywood user=derekmiller")
     cur = conn.cursor()
 
-    # CREATE TABLE showings (id serial PRIMARY KEY, title varchar, time timestamp, url varchar, UNIQUE (title, time));
+    try:
+        cur.execute('CREATE TABLE showings (id serial PRIMARY KEY, \
+             title varchar, time timestamp, url varchar, UNIQUE (title, time))')
+    except psycopg2.ProgrammingError:
+        pass
+    finally:
+        conn.commit()
 
     for showing in showings:
         try:
             sql = 'INSERT INTO showings (title, time, url) VALUES (%s, %s, %s)'
             data = (showing['title'], showing['time'], showing['url'])
             cur.execute(sql, data)
-            conn.commit()
         except psycopg2.IntegrityError:
-            conn.rollback()
             continue
+        finally:
+            conn.commit()
+
     cur.close()
     conn.close()
 
