@@ -88,5 +88,6 @@ def main():
     responses = this_month_response + next_month_response
     showings = parse_html(responses)
     save_to_db(showings)
+    print ('hollywood-scraper successfully ran at {}'.format(datetime.now()))
 
 main()
