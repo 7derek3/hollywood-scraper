@@ -10,8 +10,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def get_showings():
-    urlparse.uses_netloc.append("postgres")
-    url = urlparse.urlparse(os.environ["DATABASE_URL"])
+    url = urlparse(os.environ["DATABASE_URL"])
 
     conn = psycopg2.connect(
         database=url.path[1:],
