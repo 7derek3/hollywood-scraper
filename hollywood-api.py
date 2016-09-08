@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
+import os
+import urlparse
 import psycopg2
 import datetime
 
@@ -8,7 +10,16 @@ app = Flask(__name__)
 
 @app.route('/')
 def get_showings():
-    conn = psycopg2.connect("dbname=hollywood user=derekmiller")
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
     cur = conn.cursor()
 
     start_date = request.headers.get('start_date')

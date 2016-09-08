@@ -1,4 +1,6 @@
 from lxml import etree
+import os
+import urlparse
 import psycopg2
 from io import StringIO, BytesIO
 import requests
@@ -55,7 +57,16 @@ def parse_html(days):
     return showings
 
 def save_to_db(showings):
-    conn = psycopg2.connect("dbname=hollywood user=derekmiller")
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
     cur = conn.cursor()
 
     try:
