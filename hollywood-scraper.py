@@ -57,7 +57,7 @@ def parse_html(days):
     return showings
 
 def save_to_db(showings):
-    url = urlparse(os.environ["DATABASE_URL"])
+    url = urlparse(os.getenviron["DATABASE_URL"])
 
     conn = psycopg2.connect(
         database=url.path[1:],
