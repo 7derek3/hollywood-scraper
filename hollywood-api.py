@@ -1,6 +1,5 @@
 from flask import Flask
-from flask import jsonify
-from flask import request
+from flask import jsonify, redirect, request
 import os
 from urllib.parse import urlparse
 import psycopg2
@@ -8,10 +7,9 @@ import datetime
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/showings')
 def get_showings():
     url = urlparse(os.environ["DATABASE_URL"])
-
     conn = psycopg2.connect(
         database=url.path[1:],
         user=url.username,
@@ -21,9 +19,8 @@ def get_showings():
     )
     cur = conn.cursor()
 
-    start_date = request.headers.get('start_date')
-    end_date = request.headers.get('end_date')
-
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
     if not start_date and not end_date:
         start_date = datetime.datetime.today()
         end_date = start_date + datetime.timedelta(days=7)
