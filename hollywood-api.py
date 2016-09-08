@@ -2,7 +2,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 import os
-import urlparse
+from urllib.parse import urlparse
 import psycopg2
 import datetime
 

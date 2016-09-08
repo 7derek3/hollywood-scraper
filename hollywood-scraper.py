@@ -1,6 +1,6 @@
 from lxml import etree
 import os
-import urlparse
+from urllib.parse import urlparse
 import psycopg2
 from io import StringIO, BytesIO
 import requests
