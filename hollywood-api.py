@@ -9,9 +9,6 @@ app = Flask(__name__)
 
 @app.route('/showings')
 def get_showings():
-    conn = open_db_connection()
-    cur = conn.cursor()
-
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     if not start_date and not end_date:
@@ -34,29 +31,24 @@ def get_showings():
 
     sql = 'SELECT * FROM showings WHERE time BETWEEN \'{}\' AND \'{}\' \
                  ORDER BY time ASC;'.format(start_date, end_date)
-    print(sql)
-    showings = send_request(cur, sql)
-    return jsonify(showings)
 
-    cur.close()
-    conn.close()
+    conn = open_db_connection()
+    showings = send_request(conn, sql)
+
+    return jsonify(showings)
 
 @app.route('/new')
 def new_showings():
-    conn = open_db_connection()
-    cur = conn.cursor()
-
     max_number = request.args.get('max_number')
 
     if not max_number:
         max_number = 5
 
     sql = 'SELECT * FROM showings ORDER BY id DESC LIMIT %s;' % max_number
-    showings = send_request(cur, sql)
-    return jsonify(showings)
+    conn = open_db_connection()
+    showings = send_request(conn, sql)
 
-    cur.close()
-    conn.close()
+    return jsonify(showings)
 
 def open_db_connection():
     url = urlparse(os.environ["DATABASE_URL"])
@@ -67,9 +59,11 @@ def open_db_connection():
         host=url.hostname,
         port=url.port
     )
+
     return conn
 
-def send_request(cur, sql):
+def send_request(conn, sql):
+    cur = conn.cursor()
     cur.execute(sql)
     data = cur.fetchall()
     showings = []
@@ -79,4 +73,7 @@ def send_request(cur, sql):
         time = x[2]
         url = x[3]
         showings.append({'id': _id, 'title': title, 'time': time, 'url': url})
+    cur.close()
+    conn.close()
+
     return showings
