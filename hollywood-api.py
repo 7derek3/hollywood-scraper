@@ -9,14 +9,7 @@ app = Flask(__name__)
 
 @app.route('/showings')
 def get_showings():
-    url = urlparse(os.environ["DATABASE_URL"])
-    conn = psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port
-    )
+    conn = open_db_connection()
     cur = conn.cursor()
 
     start_date = request.args.get('start_date')
@@ -39,8 +32,45 @@ def get_showings():
         return jsonify({'errors': {'status': '400', 'details': \
                         'Incorrect date format. Should be \'year-month-day\''}})
 
-    cur.execute('SELECT * FROM showings WHERE time BETWEEN %s AND %s \
-                 ORDER BY time ASC;', (start_date, end_date))
+    sql = 'SELECT * FROM showings WHERE time BETWEEN \'{}\' AND \'{}\' \
+                 ORDER BY time ASC;'.format(start_date, end_date)
+    print(sql)
+    showings = send_request(cur, sql)
+    return jsonify(showings)
+
+    cur.close()
+    conn.close()
+
+@app.route('/new')
+def new_showings():
+    conn = open_db_connection()
+    cur = conn.cursor()
+
+    max_number = request.args.get('max_number')
+
+    if not max_number:
+        max_number = 5
+
+    sql = 'SELECT * FROM showings ORDER BY id DESC LIMIT %s;' % max_number
+    showings = send_request(cur, sql)
+    return jsonify(showings)
+
+    cur.close()
+    conn.close()
+
+def open_db_connection():
+    url = urlparse(os.environ["DATABASE_URL"])
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+    return conn
+
+def send_request(cur, sql):
+    cur.execute(sql)
     data = cur.fetchall()
     showings = []
     for x in data:
@@ -49,7 +79,4 @@ def get_showings():
         time = x[2]
         url = x[3]
         showings.append({'id': _id, 'title': title, 'time': time, 'url': url})
-    return jsonify(showings)
-
-    cur.close()
-    conn.close()
+    return showings
