@@ -1,11 +1,13 @@
 from flask import Flask
 from flask import jsonify, redirect, request
+from flask_cors import CORS
 import os
 from urllib.parse import urlparse
 import psycopg2
 import datetime
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/showings')
 def get_showings():
