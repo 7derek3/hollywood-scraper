@@ -35,7 +35,25 @@ def get_showings():
                  ORDER BY time ASC;'.format(start_date, end_date)
 
     conn = open_db_connection()
-    showings = send_request(conn, sql)
+    cur = conn.cursor()
+    cur.execute(sql)
+    data = cur.fetchall()
+    showings = {}
+    for x in data:
+        _id = x[0]
+        title = x[1]
+        _datetime = x[2]
+        url = x[3]
+
+        date = _datetime.strftime('%Y-%m-%d')
+        time = _datetime.strftime('%H:%M')
+
+        if date not in showings:
+            showings[date] = []
+
+        # showings.append({'id': _id, 'title': title, 'time': time, 'url': url})
+    cur.close()
+    conn.close()
 
     return jsonify(showings)
 
