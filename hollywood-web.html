@@ -13,9 +13,24 @@
   <script type="text/javascript">
   $(document).ready(function() {
     $.getJSON('http://127.0.0.1:5000/showings', function(data) {
-        console.log(data);
+        for (var date in data) {
+          $(".dates").append("<li id="+date+">"+date+"</li>");
+          for (var title in data[date]) {
+            $("#"+date).append("<ul><li>"+title+"</li>");
+            for (var showing in data[date][title]) {
+              time = data[date][title][showing]['time']
+              $("#"+date+">ul>li:contains('"+title+"')").append("<ul><li>"+time+"</li>");
+            };
+          };
+        };
     });
   });
   </script>
+
+  <div id="showings">
+    <h3>Showings</h3>
+    <ul class="dates">
+    </ul>
+  </div>
   </body>
 </html>
