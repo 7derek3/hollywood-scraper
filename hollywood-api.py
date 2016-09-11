@@ -49,11 +49,11 @@ def get_showings():
         time = _datetime.strftime('%H:%M')
 
         if date not in showings:
-            showings[date] = {title: [{'id': _id, 'time': time, 'url': url}]}
+            showings[date] = {title: [{'time': time, 'url': url}]}
         elif title not in showings[date]:
-            showings[date][title] = [{'id': _id, 'time': time, 'url': url}]
-        elif not next((item for item in showings[date][title] if item["id"] == id), False):
-            showings[date][title].append({'id': _id, 'time': time, 'url': url})
+            showings[date][title] = [{'time': time, 'url': url}]
+        elif not next((item for item in showings[date][title] if item["time"] == time), False):
+            showings[date][title].append({'time': time, 'url': url})
 
     cur.close()
     conn.close()
