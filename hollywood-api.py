@@ -39,6 +39,7 @@ def get_showings():
     cur.execute(sql)
     data = cur.fetchall()
     showings = {}
+    showings['dates'] = {}
     for x in data:
         _id = x[0]
         title = x[1]
@@ -48,12 +49,15 @@ def get_showings():
         date = _datetime.strftime('%Y-%m-%d')
         time = _datetime.strftime('%H:%M')
 
-        if date not in showings:
-            showings[date] = {title: [{'time': time, 'url': url}]}
-        elif title not in showings[date]:
-            showings[date][title] = [{'time': time, 'url': url}]
-        elif not next((item for item in showings[date][title] if item["time"] == time), False):
-            showings[date][title].append({'time': time, 'url': url})
+        if date not in showings['dates']:
+            showings['dates'][date] = {}
+            showings['dates'][date]['titles'] = {}
+        if title not in showings['dates'][date]['titles']:
+            showings['dates'][date]['titles'][title] = {}
+            showings['dates'][date]['titles'][title]['url'] = url
+            showings['dates'][date]['titles'][title]['showings'] = []
+        if time not in showings['dates'][date]['titles'][title]['showings']:
+            showings['dates'][date]['titles'][title]['showings'].append(time)
 
     cur.close()
     conn.close()
