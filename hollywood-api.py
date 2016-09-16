@@ -55,9 +55,9 @@ def get_showings():
         if title not in showings['dates'][date]['titles']:
             showings['dates'][date]['titles'][title] = {}
             showings['dates'][date]['titles'][title]['url'] = url
-            showings['dates'][date]['titles'][title]['showings'] = []
-        if time not in showings['dates'][date]['titles'][title]['showings']:
-            showings['dates'][date]['titles'][title]['showings'].append(time)
+            showings['dates'][date]['titles'][title]['times'] = []
+        if time not in showings['dates'][date]['titles'][title]['times']:
+            showings['dates'][date]['titles'][title]['times'].append(time)
 
     cur.close()
     conn.close()
