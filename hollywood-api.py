@@ -11,6 +11,7 @@ CORS(app)
 
 @app.route('/showings')
 def get_showings():
+    # Logic for setting start_date and end_date
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     if not start_date and not end_date:
@@ -38,8 +39,10 @@ def get_showings():
     cur = conn.cursor()
     cur.execute(sql)
     data = cur.fetchall()
+
+    # Output response to desired json
     showings = {}
-    showings['dates'] = {}
+    showings['showings'] = {}
     for x in data:
         _id = x[0]
         title = x[1]
@@ -49,15 +52,14 @@ def get_showings():
         date = _datetime.strftime('%Y-%m-%d')
         time = _datetime.strftime('%H:%M')
 
-        if date not in showings['dates']:
-            showings['dates'][date] = {}
-            showings['dates'][date]['titles'] = {}
-        if title not in showings['dates'][date]['titles']:
-            showings['dates'][date]['titles'][title] = {}
-            showings['dates'][date]['titles'][title]['url'] = url
-            showings['dates'][date]['titles'][title]['showtimes'] = []
-        if time not in showings['dates'][date]['titles'][title]['showtimes']:
-            showings['dates'][date]['titles'][title]['showtimes'].append(time)
+        if date not in showings['showings']:
+            showings['showings'][date] = {}
+        if title not in showings['showings'][date]:
+            showings['showings'][date][title] = {}
+            showings['showings'][date][title]['url'] = url
+            showings['showings'][date][title]['showtimes'] = []
+        if time not in showings['showings'][date][title]['showtimes']:
+            showings['showings'][date][title]['showtimes'].append(time)
 
     cur.close()
     conn.close()
@@ -71,9 +73,20 @@ def new_showings():
     if not max_number:
         max_number = 5
 
-    sql = 'SELECT * FROM showings ORDER BY id DESC LIMIT %s;' % max_number
+    sql = 'SELECT DISTINCT title, MAX(url), MAX(id) FROM showings \
+           GROUP BY title ORDER BY MAX(id) DESC LIMIT %s;' % max_number
     conn = open_db_connection()
-    showings = send_request(conn, sql)
+    cur = conn.cursor()
+    cur.execute(sql)
+    data = cur.fetchall()
+    showings = []
+    for x in data:
+        _id = x[2]
+        title = x[0]
+        url = x[1]
+        showings.append({'title': title, 'url': url})
+    cur.close()
+    conn.close()
 
     return jsonify(showings)
 
@@ -88,19 +101,3 @@ def open_db_connection():
     )
 
     return conn
-
-def send_request(conn, sql):
-    cur = conn.cursor()
-    cur.execute(sql)
-    data = cur.fetchall()
-    showings = []
-    for x in data:
-        _id = x[0]
-        title = x[1]
-        time = x[2]
-        url = x[3]
-        showings.append({'id': _id, 'title': title, 'time': time, 'url': url})
-    cur.close()
-    conn.close()
-
-    return showings
