@@ -42,7 +42,7 @@ def get_showings():
 
     # Output response to desired json
     showings = {}
-    showings['showings'] = {}
+    titles = {}
     for x in data:
         _id = x[0]
         title = x[1]
@@ -52,14 +52,18 @@ def get_showings():
         date = _datetime.strftime('%Y-%m-%d')
         time = _datetime.strftime('%H:%M')
 
-        if date not in showings['showings']:
-            showings['showings'][date] = {}
-        if title not in showings['showings'][date]:
-            showings['showings'][date][title] = {}
-            showings['showings'][date][title]['url'] = url
-            showings['showings'][date][title]['showtimes'] = []
-        if time not in showings['showings'][date][title]['showtimes']:
-            showings['showings'][date][title]['showtimes'].append(time)
+        if date not in showings:
+            showings[date] = []
+            if titles:
+                showings[last_date].append(titles)
+            titles = {}
+        if title not in titles:
+            titles[title] = {}
+            titles[title]['url'] = url
+            titles[title]['showtimes'] = []
+        if time not in titles[title]['showtimes']:
+            titles[title]['showtimes'].append(time)
+            last_date = date
 
     cur.close()
     conn.close()
