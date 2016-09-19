@@ -56,7 +56,7 @@ def get_showings():
             showings[date] = []
             if titles:
                 showings[last_date].append(titles)
-            titles = {}
+                titles = {}
         if title not in titles:
             titles[title] = {}
             titles[title]['url'] = url
@@ -65,6 +65,7 @@ def get_showings():
             titles[title]['showtimes'].append(time)
             last_date = date
 
+    showings[last_date].append(titles)
     cur.close()
     conn.close()
 
