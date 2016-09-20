@@ -42,20 +42,20 @@ def get_showings():
 
     # Output response to desired json
     showings = {}
+    showings['showings'] = {}
     titles = {}
     for x in data:
         _id = x[0]
         title = x[1]
         _datetime = x[2]
         url = x[3]
-
         date = _datetime.strftime('%Y-%m-%d')
         time = _datetime.strftime('%H:%M')
 
-        if date not in showings:
-            showings[date] = []
+        if date not in showings['showings']:
+            showings['showings'][date] = []
             if titles:
-                showings[last_date].append(titles)
+                showings['showings'][last_date].append(titles)
                 titles = {}
         if title not in titles:
             titles[title] = {}
@@ -64,8 +64,8 @@ def get_showings():
         if time not in titles[title]['showtimes']:
             titles[title]['showtimes'].append(time)
             last_date = date
+    showings['showings'][last_date].append(titles)
 
-    showings[last_date].append(titles)
     cur.close()
     conn.close()
 
@@ -84,16 +84,16 @@ def new_showings():
     cur = conn.cursor()
     cur.execute(sql)
     data = cur.fetchall()
-    showings = []
+    titles = []
     for x in data:
         _id = x[2]
         title = x[0]
         url = x[1]
-        showings.append({'title': title, 'url': url})
+        titles.append({'title': title, 'url': url})
     cur.close()
     conn.close()
 
-    return jsonify(showings)
+    return jsonify(titles)
 
 def open_db_connection():
     url = urlparse(os.environ["DATABASE_URL"])
